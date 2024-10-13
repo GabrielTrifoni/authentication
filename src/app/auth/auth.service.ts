@@ -10,8 +10,6 @@ export class AuthService {
     ) { }
 
     public getTokenForUser(user: User): string {
-        console.log(process.env.AUTH_SECRET);
-
         return this.jwtService.sign({
             username: user.username,
             sub: user.id,

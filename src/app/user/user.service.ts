@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "../entities/user.entity";
 import { Repository } from "typeorm";
@@ -13,7 +13,7 @@ export class UserService {
         private readonly userRepository: Repository<User>,
     ) { }
 
-    async create(@Body() createUserDto: CreateUserDto) {
+    async create(createUserDto: CreateUserDto): Promise<User> {
         const user = new User();
 
         if (createUserDto.password !== createUserDto.retypedPassword) {
@@ -31,9 +31,6 @@ export class UserService {
         user.username = createUserDto.username;
         user.password = await this.authService.hashPassword(createUserDto.password);
 
-        return {
-            ...(await this.userRepository.save(user)),
-            token: this.authService.getTokenForUser(user),
-        }
+        return await this.userRepository.save(user);
     }
 }
